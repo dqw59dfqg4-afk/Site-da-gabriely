@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Uma declaração especial para Gabriely — foto, música e uma mensagem de amor." />
   <title>Gabriely — Te Amo</title>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -13,9 +14,23 @@
       <h1 id="title">Gabriely, eu te amo</h1>
       <p id="message">Sou apaixonado pelo seu sorriso — aqui é o lugar onde eu declaro todo o meu amor por você.</p>
 
-      <div class="controls">
-        <button id="playBtn" aria-label="Tocar música">Tocar música</button>
-        <a id="shareBtn" href="#" onclick="share()">Compartilhar</a>
+      <div class="music-area">
+        <div class="controls">
+          <button id="playBtn" disabled aria-label="Tocar música">Tocar música</button>
+          <button id="loadDefault" title="Carregar música padrão">Carregar música padrão</button>
+          <a id="shareBtn" href="#" onclick="share()">Compartilhar</a>
+        </div>
+
+        <div class="music-input">
+          <input id="musicUrl" type="url" placeholder="Cole o link direto da música (MP3) ou URL pública" />
+          <button id="loadBtn">Carregar</button>
+        </div>
+
+        <div class="volume-row">
+          <label for="volume">Volume</label>
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+          <span id="audioStatus">Nenhuma música carregada</span>
+        </div>
       </div>
 
     </div>

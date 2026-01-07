@@ -1,17 +1,46 @@
 const audio = document.getElementById('bg-audio');
 const playBtn = document.getElementById('playBtn');
+const loadBtn = document.getElementById('loadBtn');
+const musicUrl = document.getElementById('musicUrl');
+const audioStatus = document.getElementById('audioStatus');
+const volume = document.getElementById('volume');
+const loadDefault = document.getElementById('loadDefault');
+
+function updatePlayState(){
+  if (!audio.src) {
+    playBtn.disabled = true;
+    playBtn.textContent = 'Tocar música';
+  } else {
+    playBtn.disabled = false;
+    playBtn.textContent = audio.paused ? 'Tocar música' : 'Pausar música';
+  }
+}
 
 playBtn.addEventListener('click', () => {
   if (audio.paused) {
     audio.play().catch(()=>{
       // Autoplay may be blocked; toggle UI
-      alert('Navegador bloqueou autoplay. Use o botão para tocar.');
+      alert('Navegador bloqueou autoplay. Toque manualmente usando o botão.');
     });
-    playBtn.textContent = 'Pausar música';
   } else {
     audio.pause();
-    playBtn.textContent = 'Tocar música';
   }
+  updatePlayState();
+});
+
+loadBtn.addEventListener('click', () => {
+  const url = musicUrl.value.trim();
+  if (!url) return alert('Cole o link da música primeiro.');
+  setAudio(url, true);
+});
+
+loadDefault.addEventListener('click', ()=>{
+  // fallback to bundled file
+  setAudio('/assets/audio/cidade_vizinha.mp3', false);
+});
+
+volume.addEventListener('input', ()=>{
+  audio.volume = volume.value;
 });
 
 // Share feature (uses Web Share API if available)
@@ -27,10 +56,32 @@ function share(){
 }
 
 // Allow setting the audio source later via JS
-window.setAudio = function(url){
+window.setAudio = function(url, autoplay = false){
   audio.src = url;
   audio.load();
+  audio.oncanplay = () => {
+    audioStatus.textContent = 'Música carregada';
+    if (autoplay) audio.play().catch(()=>{});
+    updatePlayState();
+  }
+  audio.onerror = () => {
+    audioStatus.textContent = 'Erro ao carregar a música';
+    updatePlayState();
+  }
 }
+
+// Support ?music=URL param to pre-load music (not autoplay)
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const m = params.get('music');
+  if (m) {
+    musicUrl.value = m;
+    setAudio(m, false);
+  } else {
+    // if bundled file exists, show as available
+    if (audio.src) audioStatus.textContent = 'Música padrão disponível';
+  }
+})();
 
 // Simple floating hearts
 function spawnHeart(){
@@ -45,3 +96,6 @@ function spawnHeart(){
   setTimeout(()=>h.remove(), dur);
 }
 setInterval(spawnHeart, 900);
+
+// keep UI consistent
+updatePlayState();
